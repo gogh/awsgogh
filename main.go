@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-	"github.com/stoggi/aws-oidc/cli"
+	"github.com/stoggi/awsgogh/cli"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -36,7 +36,7 @@ func run(args []string, exit func(int)) {
 	}
 
 	app := kingpin.New(
-		"aws-oidc",
+		"awsgogh",
 		"Assume roles in AWS using an OIDC identity provider",
 	)
 
@@ -50,6 +50,7 @@ func run(args []string, exit func(int)) {
 	cli.ConfigureExec(app, &config)
 	cli.ConfigureList(app, &config)
 	cli.ConfigureLogin(app, &config)
+	cli.ConfigureSSH(app, &config)
 
 	kingpin.MustParse(app.Parse(args))
 }

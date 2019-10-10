@@ -10,40 +10,30 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-// LoginConfig stores the parameters needed for an login command
-type LoginConfig struct {
+// SSHConfig stores the parameters needed for a SSH command
+type SSHConfig struct {
 	Profile string
 }
 
-type signinSession struct {
-	SessionID    string `json:"sessionId"`
-	SessionKey   string `json:"sessionKey"`
-	SessionToken string `json:"sessionToken"`
-}
+// ConfigureSSH configures the ssh command with arguments and flags
+func ConfigureSSH(app *kingpin.Application, config *GlobalConfig) {
 
-type signinToken struct {
-	SigninToken string
-}
+	sshConfig := SSHConfig{}
 
-// ConfigureLogin configures the login command with arguments and flags
-func ConfigureLogin(app *kingpin.Application, config *GlobalConfig) {
-
-	loginConfig := LoginConfig{}
-
-	cmd := app.Command("login", "Login to the AWS console for a given profile")
+	cmd := app.Command("ssh", "Sign a SSH certificate")
 
 	cmd.Arg("profile", "Name of the profile").
 		StringVar(&config.Profile)
 
 	cmd.Action(func(c *kingpin.ParseContext) error {
-		LoginCommand(app, config, &loginConfig)
+		SSHCommand(app, config, &sshConfig)
 		return nil
 	})
 }
 
-// LoginCommand exchanges temporary credentials for an AWS Console signin url
+// SSHCommand exchanges temporary credentials for an AWS Console signin url
 // https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_enable-console-custom-url.html
-func LoginCommand(app *kingpin.Application, config *GlobalConfig, loginConfig *LoginConfig) {
+func SSHCommand(app *kingpin.Application, config *GlobalConfig, sshConfig *SSHConfig) {
 
 	// Retrieve credentials from current session. This will try and get credentials
 	// using awsgogh itself if configured in ~/.aws/config.
@@ -85,13 +75,13 @@ func LoginCommand(app *kingpin.Application, config *GlobalConfig, loginConfig *L
 		app.Fatalf("Unable to decode GetSigninToken response for profile: %s", config.Profile)
 	}
 
-	// Create the federation URL to exchange the session token for a login URL
-	loginURL, _ := url.Parse("https://signin.aws.amazon.com/federation")
-	loginQuery := url.Values{}
-	loginQuery.Set("Action", "login")
-	loginQuery.Set("Destination", "https://console.aws.amazon.com/")
-	loginQuery.Set("SigninToken", token.SigninToken)
-	loginURL.RawQuery = loginQuery.Encode()
+	// Create the federation URL to exchange the session token for a ssh URL
+	sshURL, _ := url.Parse("https://signin.aws.amazon.com/federation")
+	sshQuery := url.Values{}
+	sshQuery.Set("Action", "ssh")
+	sshQuery.Set("Destination", "https://console.aws.amazon.com/")
+	sshQuery.Set("SigninToken", token.SigninToken)
+	sshURL.RawQuery = sshQuery.Encode()
 
-	fmt.Println(loginURL)
+	fmt.Println(sshURL)
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/stoggi/aws-oidc/provider"
+	"github.com/stoggi/awsgogh/provider"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -178,7 +178,7 @@ func assumeRoleWithWebIdentity(authConfig *AuthConfig, idToken string) (string, 
 	input := &sts.AssumeRoleWithWebIdentityInput{
 		DurationSeconds:  aws.Int64(authConfig.Duration),
 		RoleArn:          aws.String(authConfig.RoleArn),
-		RoleSessionName:  aws.String("aws-oidc"),
+		RoleSessionName:  aws.String("awsgogh"),
 		WebIdentityToken: aws.String(idToken),
 	}
 
